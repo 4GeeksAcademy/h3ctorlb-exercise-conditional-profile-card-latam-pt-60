@@ -23,27 +23,75 @@ import "../style/index.css";
     }
  */
 function render(variables = {}) {
-  console.log("These are the current variables: ", variables); // print on the console
-  // here we ask the logical questions to make decisions on how to build the html
-  // if includeCover==false then we reset the cover code without the <img> tag to make the cover transparent.
-  let cover = `<div class="cover"><img src="${variables.background}" /></div>`;
-  if (variables.includeCover == false) cover = "<div class='cover'></div>";
+  console.log("These are the current variables: ", variables);
 
-  // reset the website body with the new html output
-  document.querySelector("#widget_content").innerHTML = `<div class="widget">
-            ${cover}
-          <img src="${variables.avatarURL}" class="photo" />
-          <h1>Lucy Boilett</h1>
-          <h2>Web Developer</h2>
-          <h3>Miami, USA</h3>
-          <ul class="position-right">
-            <li><a href="https://twitter.com/4geeksacademy"><i class="fab fa-twitter"></i></a></li>
-            <li><a href="https://github.com/4geeksacademy"><i class="fab fa-github"></i></a></li>
-            <li><a href="https://linkedin.com/school/4geeksacademy"><i class="fab fa-linkedin"></i></a></li>
-            <li><a href="https://instagram.com/4geeksacademy"><i class="fab fa-instagram"></i></a></li>
-          </ul>
-        </div>
-    `;
+  // covers temáticos
+  const themedCovers = {
+    city:
+      "https://images.unsplash.com/photo-1462899006636-339e08d1844e?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    beach:
+      "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2726&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    tech:
+      "https://images.unsplash.com/photo-1548092372-0d1bd40894a3?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    creative:
+      "https://images.unsplash.com/photo-1726083518543-649032a0055e?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    nature:
+      "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=1752&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    coffee:
+      "https://images.unsplash.com/photo-1573134005528-db6a82e51995?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  };
+
+  // detectar si el background es un tema o una URL
+  let finalBackground = variables.background;
+  if (themedCovers[variables.background]) {
+    finalBackground = themedCovers[variables.background];
+  }
+
+  // COVER
+  let cover = "";
+  if (variables.includeCover) {
+    cover = `<div class="cover"><img src="${finalBackground}" /></div>`;
+  } else {
+    cover = `<div class="cover"></div>`;
+  }
+
+  // SOCIAL MEDIA
+  const twitter = variables.twitter
+    ? `<li><a href="https://twitter.com/${variables.twitter}"><i class="fab fa-twitter"></i></a></li>`
+    : "";
+
+  const github = variables.github
+    ? `<li><a href="https://github.com/${variables.github}"><i class="fab fa-github"></i></a></li>`
+    : "";
+
+  const linkedin = variables.linkedin
+    ? `<li><a href="https://linkedin.com/in/${variables.linkedin}"><i class="fab fa-linkedin"></i></a></li>`
+    : "";
+
+  const instagram = variables.instagram
+    ? `<li><a href="https://instagram.com/${variables.instagram}"><i class="fab fa-instagram"></i></a></li>`
+    : "";
+
+  // HTML FINAL
+  document.querySelector("#widget_content").innerHTML = `
+    <div class="widget">
+      ${cover}
+      <img src="${variables.avatarURL || ""}" class="photo" />
+      <h1>${variables.name || ""} ${variables.lastName || ""}</h1>
+      <h2>${variables.role || ""}</h2>
+      <h3>
+        ${variables.city || ""}
+        ${variables.city && variables.country ? ", " : ""}
+        ${variables.country || ""}
+      </h3>
+      <ul class="${variables.socialMediaPosition || "position-right"}">
+        ${twitter}
+        ${github}
+        ${linkedin}
+        ${instagram}
+      </ul>
+    </div>
+  `;
 }
 
 /**
@@ -74,8 +122,7 @@ window.onload = function() {
 
   document.querySelectorAll(".picker").forEach(function(elm) {
     elm.addEventListener("change", function(e) {
-      // <- add a listener to every input
-      const attribute = e.target.getAttribute("for"); // when any input changes, collect the value
+      const attribute = e.target.getAttribute("for");
       let values = {};
       values[attribute] =
         this.value == "" || this.value == "null"
@@ -85,7 +132,7 @@ window.onload = function() {
           : this.value == "false"
           ? false
           : this.value;
-      render(Object.assign(window.variables, values)); // render again the card with new values
+      render(Object.assign(window.variables, values));
     });
   });
 };
